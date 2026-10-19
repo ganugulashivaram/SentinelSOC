@@ -1,0 +1,12 @@
+
+rule,source_ip,failed_attempts,severity,message
+"Brute-Force Login Detection",192.0.2.10,15,HIGH,"[SIMULATED] 15 failed login attempts within 5 minutes."
+"Suspicious PowerShell Activity",198.51.100.25,0,HIGH,"[SIMULATED] Suspicious encoded PowerShell command in sample endpoint logs."
+"Possible Port Scanning",203.0.113.10,0,HIGH,"[SIMULATED] One source contacted multiple destination ports."
+"Repeated Failed Logins",192.0.2.20,5,MEDIUM,"[SIMULATED] Five failed logins observed."
+"Unusual Outbound Traffic",198.51.100.30,0,MEDIUM,"[SIMULATED] Unusual outbound traffic volume in sample network logs."
+"Repeated HTTP 404 Responses",203.0.113.20,0,MEDIUM,"[SIMULATED] Repeated HTTP 404 responses in sample web logs."
+"Unexpected Privilege Change",192.0.2.30,0,MEDIUM,"[SIMULATED] Sample audit event reports a privilege change."
+"Single Failed Login",198.51.100.40,1,LOW,"[SIMULATED] One failed login attempt."
+"Routine DNS Query",203.0.113.30,0,LOW,"[SIMULATED] Informational DNS event; no malicious activity established."
+"Successful User Login",192.0.2.40,0,LOW,"[SIMULATED] Informational successful-login event."

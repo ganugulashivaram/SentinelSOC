@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelSOC | Security Dashboard</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/script.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>SentinelSOC</h1>
+        <p>Security Operations Center Dashboard</p>
+        <p id="connection">Connecting...</p>
+    </header>
+
+    <main>
+        <section class="summary-cards">
+            <div class="stat-card">
+                <h3>Total Alerts</h3>
+                <p id="total-alerts">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>High Severity</h3>
+                <p id="high-alerts">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Medium Severity</h3>
+                <p id="medium-alerts">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Low Severity</h3>
+                <p id="low-alerts">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Unique Source IPs</h3>
+                <p id="unique-ips">0</p>
+            </div>
+        </section>
+
+        <section class="alerts-section">
+            <h2>Security Alerts</h2>
+
+            <div class="filters">
+                <label for="severity-filter">Severity:</label>
+                <select id="severity-filter">
+                    <option value="">All Severities</option>
+                    <option value="HIGH">High</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="LOW">Low</option>
+                </select>
+
+                <label for="ip-search">Source IP:</label>
+                <input type="text" id="ip-search" placeholder="Search source IP">
+
+                <label for="start-date">Start Date:</label>
+                <input type="date" id="start-date">
+
+                <label for="end-date">End Date:</label>
+                <input type="date" id="end-date">
+
+                <button id="apply-date-filter" type="button">Apply Filters</button>
+                <button id="clear-date-filter" type="button">Clear Dates</button>
+
+                <label for="sort-filter">Sort:</label>
+                <select id="sort-filter">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                </select>
+
+                <button id="refresh-btn" type="button">Refresh</button>
+                <button id="export-btn" type="button">Export CSV</button>
+            </div>
+
+            <section class="import-section" aria-labelledby="import-heading">
+                <h3 id="import-heading">Import Test Alerts</h3>
+                <p>
+                    Upload a CSV with rule, source_ip, failed_attempts,
+                    severity, and message columns. Use simulated data only.
+                </p>
+                <form id="import-form">
+                    <label for="import-file">Choose CSV file:</label>
+                    <input
+                        type="file"
+                        id="import-file"
+                        name="file"
+                        accept=".csv,text/csv"
+                        required
+                    >
+                    <button type="submit" id="import-btn">Import CSV</button>
+                </form>
+                <p id="import-message" role="status" aria-live="polite"></p>
+            </section>
+
+            <p id="message" role="status">Loading alerts...</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Severity</th>
+                            <th>Detection Rule</th>
+                            <th>Source IP</th>
+                            <th>Attempts</th>
+                            <th>Detected At (UTC)</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alerts-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="details-overlay" class="details-overlay" hidden>
+        <section
+            class="details-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="details-title"
+        >
+            <div class="details-header">
+                <h2 id="details-title">Alert Investigation</h2>
+                <button id="close-details" type="button">Close</button>
+            </div>
+            <div id="details-content">
+                <p>Select an alert to view its details.</p>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
