@@ -1,6 +1,0 @@
-﻿id,created_at,rule,severity,source_ip,failed_attempts,status,ip_type,reputation,is_global,malicious_detections,suspicious_detections,harmless_detections,enrichment_note,message
-5,2026-10-16 10:16:39,Brute-Force Login Detection,HIGH,192.168.1.50,10,New,Unknown,Unknown,False,0,0,0,No enrichment information available.,Detected 10 failed login attempts from 192.168.1.50 within 5 minutes. Latest targeted username: root.
-4,2026-10-16 10:16:39,Repeated Failed Logins,HIGH,192.168.1.50,3,New,Unknown,Unknown,False,0,0,0,No enrichment information available.,3 failed login attempts from 192.168.1.50 within 5 minutes
-3,2026-10-14 10:02:12,Repeated Failed Logins,HIGH,192.168.1.50,3,New,Unknown,Unknown,False,0,0,0,No enrichment information available.,3 failed login attempts from 192.168.1.50
-2,2026-10-14 09:36:26,Repeated Failed Logins,HIGH,192.168.1.50,3,New,Unknown,Unknown,False,0,0,0,No enrichment information available.,3 failed login attempts from 192.168.1.50
-1,2026-10-14 09:33:21,Repeated Failed Logins,HIGH,192.168.1.50,3,Investigating,Unknown,Unknown,False,0,0,0,No enrichment information available.,3 failed login attempts from 192.168.1.50
