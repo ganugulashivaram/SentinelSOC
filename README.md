@@ -1,4 +1,4 @@
-﻿# SentinelSOC - Security Operations Center Dashboard
+# SentinelSOC - Security Operations Center Dashboard
 
 SentinelSOC is a Python-based Security Operations Center (SOC) monitoring and alert investigation project. It demonstrates how security events can be detected, stored, enriched, reviewed, and managed through a web dashboard.
 

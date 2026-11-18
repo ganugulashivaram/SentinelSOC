@@ -1,135 +1,252 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SentinelSOC | Security Dashboard</title>
-    <link rel="stylesheet" href="/style.css">
-    <script src="/script.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SentinelSOC Dashboard</title>
+<style>
+  :root { --bg:#0f172a; --card:#1e293b; --text:#e2e8f0; --muted:#94a3b8;
+          --high:#ef4444; --med:#f59e0b; --low:#22c55e; --accent:#38bdf8; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:system-ui,Segoe UI,Arial,sans-serif;
+         background:var(--bg); color:var(--text); padding:24px; }
+  h1 { margin:0 0 4px; } .sub { color:var(--muted); margin-bottom:20px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+           gap:12px; margin-bottom:20px; }
+  .card { background:var(--card); padding:14px; border-radius:10px; }
+  .card b { display:block; font-size:26px; }
+  .filters { display:flex; flex-wrap:wrap; gap:10px; align-items:end;
+             background:var(--card); padding:14px; border-radius:10px; margin-bottom:8px; }
+  label { display:flex; flex-direction:column; font-size:12px; color:var(--muted); gap:4px; }
+  input, select, button { padding:8px; border-radius:6px; border:1px solid #334155;
+                          background:#0b1220; color:var(--text); }
+  button { cursor:pointer; background:var(--accent); color:#04202e; border:0; font-weight:600; }
+  button.secondary { background:#334155; color:var(--text); }
+  #msg { min-height:22px; margin:8px 0; color:#fca5a5; }
+  table { width:100%; border-collapse:collapse; background:var(--card);
+          border-radius:10px; overflow:hidden; }
+  th, td { padding:10px; text-align:left; border-bottom:1px solid #334155; font-size:14px; }
+  th.sortable { cursor:pointer; user-select:none; }
+  tr.row { cursor:pointer; } tr.row:hover { background:#273449; }
+  .sev { padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700; color:#0b1220; }
+  .HIGH { background:var(--high); } .MEDIUM { background:var(--med); } .LOW { background:var(--low); }
+  #details { background:var(--card); border-radius:10px; padding:16px; margin-top:16px; display:none; }
+  #details dt { color:var(--muted); font-size:12px; margin-top:8px; }
+  #details dd { margin:2px 0 0; word-break:break-word; }
+  .wrap { overflow-x:auto; }
+</style>
 </head>
 <body>
-    <header>
-        <h1>SentinelSOC</h1>
-        <p>Security Operations Center Dashboard</p>
-        <p id="connection">Connecting...</p>
-    </header>
+  <h1>SentinelSOC</h1>
+  <div class="sub">Security Operations Center Dashboard</div>
 
-    <main>
-        <section class="summary-cards">
-            <div class="stat-card">
-                <h3>Total Alerts</h3>
-                <p id="total-alerts">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>High Severity</h3>
-                <p id="high-alerts">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Medium Severity</h3>
-                <p id="medium-alerts">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Low Severity</h3>
-                <p id="low-alerts">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Unique Source IPs</h3>
-                <p id="unique-ips">0</p>
-            </div>
-        </section>
+  <div class="cards">
+    <div class="card"><span>Total</span><b id="s-total">0</b></div>
+    <div class="card"><span>High</span><b id="s-high">0</b></div>
+    <div class="card"><span>Medium</span><b id="s-med">0</b></div>
+    <div class="card"><span>Low</span><b id="s-low">0</b></div>
+    <div class="card"><span>Unique IPs</span><b id="s-ips">0</b></div>
+  </div>
 
-        <section class="alerts-section">
-            <h2>Security Alerts</h2>
+  <div class="filters">
+    <label>Severity
+      <select id="severity">
+        <option value="">All</option><option>HIGH</option>
+        <option>MEDIUM</option><option>LOW</option>
+      </select>
+    </label>
+    <label>Source IP <input id="source_ip" placeholder="e.g. 203.0.113"></label>
+    <label>Start date <input type="date" id="start_date"></label>
+    <label>End date <input type="date" id="end_date"></label>
+    <button id="apply">Apply</button>
+    <button id="reset" class="secondary">Reset</button>
+    <button id="export" class="secondary">Export CSV</button>
+  </div>
+  <div id="msg"></div>
 
-            <div class="filters">
-                <label for="severity-filter">Severity:</label>
-                <select id="severity-filter">
-                    <option value="">All Severities</option>
-                    <option value="HIGH">High</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="LOW">Low</option>
-                </select>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="sortable" id="sort-id">ID <span id="arrow">&#9660;</span></th>
+          <th>Created</th><th>Rule</th><th>Severity</th>
+          <th>Source IP</th><th>Attempts</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
 
-                <label for="ip-search">Source IP:</label>
-                <input type="text" id="ip-search" placeholder="Search source IP">
+  <div id="details">
+    <h3>Alert details</h3>
+    <dl id="detail-list"></dl>
+  </div>
 
-                <label for="start-date">Start Date:</label>
-                <input type="date" id="start-date">
+<script>
+  const $ = (id) => document.getElementById(id);
+  let alerts = [];
+  let sortDesc = true;
+  const STATUSES = ["New", "Investigating", "Resolved"];
 
-                <label for="end-date">End Date:</label>
-                <input type="date" id="end-date">
+  function queryString() {
+    const p = new URLSearchParams();
+    for (const id of ["severity", "source_ip", "start_date", "end_date"]) {
+      const v = $(id).value.trim();
+      if (v) p.set(id, v);
+    }
+    return p.toString();
+  }
 
-                <button id="apply-date-filter" type="button">Apply Filters</button>
-                <button id="clear-date-filter" type="button">Clear Dates</button>
+  function showMsg(text) { $("msg").textContent = text || ""; }
 
-                <label for="sort-filter">Sort:</label>
-                <select id="sort-filter">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                </select>
+  async function loadAlerts() {
+    const start = $("start_date").value, end = $("end_date").value;
+    if (start && end && start > end) {
+      showMsg("Start date must be on or before end date.");
+      return;
+    }
+    showMsg("");
+    try {
+      const res = await fetch("/api/alerts?" + queryString());
+      const data = await res.json();
+      if (!res.ok) { showMsg(data.error || "Request failed."); return; }
+      alerts = data.alerts;
+      const s = data.summary;
+      $("s-total").textContent = s.total_alerts;
+      $("s-high").textContent = s.high_severity;
+      $("s-med").textContent = s.medium_severity;
+      $("s-low").textContent = s.low_severity;
+      $("s-ips").textContent = s.unique_source_ips;
+      render();
+    } catch (e) {
+      showMsg("Could not reach the API. Is Flask running?");
+    }
+  }
 
-                <button id="refresh-btn" type="button">Refresh</button>
-                <button id="export-btn" type="button">Export CSV</button>
-            </div>
+  function cell(text) {
+    const td = document.createElement("td");
+    td.textContent = text ?? "";
+    return td;
+  }
 
-            <section class="import-section" aria-labelledby="import-heading">
-                <h3 id="import-heading">Import Test Alerts</h3>
-                <p>
-                    Upload a CSV with rule, source_ip, failed_attempts,
-                    severity, and message columns. Use simulated data only.
-                </p>
-                <form id="import-form">
-                    <label for="import-file">Choose CSV file:</label>
-                    <input
-                        type="file"
-                        id="import-file"
-                        name="file"
-                        accept=".csv,text/csv"
-                        required
-                    >
-                    <button type="submit" id="import-btn">Import CSV</button>
-                </form>
-                <p id="import-message" role="status" aria-live="polite"></p>
-            </section>
+  function render() {
+    const sorted = [...alerts].sort((a, b) => sortDesc ? b.id - a.id : a.id - b.id);
+    $("arrow").innerHTML = sortDesc ? "&#9660;" : "&#9650;";
+    const tbody = $("rows");
+    tbody.replaceChildren();
 
-            <p id="message" role="status">Loading alerts...</p>
+    if (!sorted.length) {
+      const tr = document.createElement("tr");
+      const td = cell("No alerts match the current filters.");
+      td.colSpan = 7;
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Severity</th>
-                            <th>Detection Rule</th>
-                            <th>Source IP</th>
-                            <th>Attempts</th>
-                            <th>Detected At (UTC)</th>
-                            <th>Status</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="alerts-body"></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+    for (const a of sorted) {
+      const tr = document.createElement("tr");
+      tr.className = "row";
+      tr.addEventListener("click", () => showDetails(a));
 
-    <div id="details-overlay" class="details-overlay" hidden>
-        <section
-            class="details-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="details-title"
-        >
-            <div class="details-header">
-                <h2 id="details-title">Alert Investigation</h2>
-                <button id="close-details" type="button">Close</button>
-            </div>
-            <div id="details-content">
-                <p>Select an alert to view its details.</p>
-            </div>
-        </section>
-    </div>
+      tr.appendChild(cell(a.id));
+      tr.appendChild(cell(a.created_at));
+      tr.appendChild(cell(a.rule));
+
+      const sevTd = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = "sev " + a.severity;
+      badge.textContent = a.severity;
+      sevTd.appendChild(badge);
+      tr.appendChild(sevTd);
+
+      tr.appendChild(cell(a.source_ip));
+      tr.appendChild(cell(a.failed_attempts));
+
+      const stTd = document.createElement("td");
+      const sel = document.createElement("select");
+      for (const s of STATUSES) {
+        const o = document.createElement("option");
+        o.value = o.textContent = s;
+        if (s === a.status) o.selected = true;
+        sel.appendChild(o);
+      }
+      sel.addEventListener("click", (e) => e.stopPropagation());
+      sel.addEventListener("change", () => updateStatus(a, sel.value, sel));
+      stTd.appendChild(sel);
+      tr.appendChild(stTd);
+
+      tbody.appendChild(tr);
+    }
+  }
+
+  async function updateStatus(alert, status, selectEl) {
+    try {
+      const res = await fetch(`/api/alerts/${alert.id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showMsg(data.error || "Could not update status.");
+        selectEl.value = alert.status;
+        return;
+      }
+      alert.status = status;
+      showMsg("");
+    } catch (e) {
+      showMsg("Could not reach the API.");
+      selectEl.value = alert.status;
+    }
+  }
+
+  function showDetails(a) {
+    const fields = [
+      ["ID", "id"], ["Created", "created_at"], ["Rule", "rule"],
+      ["Severity", "severity"], ["Source IP", "source_ip"],
+      ["Failed attempts", "failed_attempts"], ["Status", "status"],
+      ["IP type", "ip_type"], ["Reputation", "reputation"],
+      ["Globally reachable", "is_global"],
+      ["VirusTotal malicious", "malicious_detections"],
+      ["VirusTotal suspicious", "suspicious_detections"],
+      ["VirusTotal harmless", "harmless_detections"],
+      ["MITRE technique ID", "mitre_id"],
+      ["MITRE technique", "mitre_technique"],
+      ["MITRE tactic", "mitre_tactic"],
+      ["Enrichment note", "enrichment_note"], ["Message", "message"],
+    ];
+    const dl = $("detail-list");
+    dl.replaceChildren();
+    for (const [label, key] of fields) {
+      const dt = document.createElement("dt");
+      dt.textContent = label;
+      const dd = document.createElement("dd");
+      const v = a[key];
+      dd.textContent = v === null || v === undefined || v === "" ? "-" : String(v);
+      dl.append(dt, dd);
+    }
+    $("details").style.display = "block";
+    $("details").scrollIntoView({ behavior: "smooth" });
+  }
+
+  $("apply").addEventListener("click", loadAlerts);
+  $("reset").addEventListener("click", () => {
+    for (const id of ["severity", "source_ip", "start_date", "end_date"]) $(id).value = "";
+    $("details").style.display = "none";
+    loadAlerts();
+  });
+  $("sort-id").addEventListener("click", () => { sortDesc = !sortDesc; render(); });
+  $("export").addEventListener("click", () => {
+    const start = $("start_date").value, end = $("end_date").value;
+    if (start && end && start > end) {
+      showMsg("Start date must be on or before end date.");
+      return;
+    }
+    window.location.href = "/api/alerts/export?" + queryString();
+  });
+
+  loadAlerts();
+</script>
 </body>
 </html>
