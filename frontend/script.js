@@ -377,10 +377,9 @@ function showAlertDetails(alertItem) {
         ["VirusTotal Malicious Detections", alertItem.malicious_detections ?? 0],
         ["VirusTotal Suspicious Detections", alertItem.suspicious_detections ?? 0],
         ["VirusTotal Harmless Detections", alertItem.harmless_detections ?? 0],
-        [
-            "Enrichment Notes",
-            alertItem.enrichment_note ?? "No enrichment information available.",
-        ],
+        ["MITRE Technique ID", alertItem.mitre_id || "Not mapped"],
+        ["MITRE Technique", alertItem.mitre_technique || "Not mapped"],
+        ["MITRE Tactic", alertItem.mitre_tactic || "Not mapped"],
         ["Message", alertItem.message],
         ["Detected At (UTC)", alertItem.created_at],
     ];
