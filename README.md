@@ -36,26 +36,32 @@ The project is designed to showcase practical skills relevant to entry-level SOC
 
 ```text
 SentinelSOC/
-â”œâ”€â”€ app/
-â”‚   â”œâ”€â”€ main.py
-â”‚   â”œâ”€â”€ database/
-â”‚   â”‚   â””â”€â”€ alert_store.py
-â”‚   â”œâ”€â”€ enrichment/
-â”‚   â”‚   â””â”€â”€ ip_reputation.py
-â”‚   â””â”€â”€ detection/
-â”‚       â””â”€â”€ ...
-â”œâ”€â”€ frontend/
-â”‚   â”œâ”€â”€ index.html
-â”‚   â”œâ”€â”€ script.js
-â”‚   â””â”€â”€ style.css
-â”œâ”€â”€ sample_logs/
-â”œâ”€â”€ tests/
-â”œâ”€â”€ .env.example
-â”œâ”€â”€ .gitignore
-â”œâ”€â”€ main.py
-â”œâ”€â”€ requirements.txt
-â”œâ”€â”€ sentinelsoc_sample_alerts.csv
-â””â”€â”€ README.md
+|-- app/
+|   |-- main.py
+|   |-- mitre.py
+|   |-- database/
+|   |   `-- alert_store.py
+|   |-- enrichment/
+|   |   `-- ip_reputation.py
+|   |-- detection/
+|   |   `-- ...
+|   `-- services/
+|       `-- alert_pipeline.py
+|-- frontend/
+|   |-- index.html
+|   |-- script.js
+|   `-- style.css
+|-- sample_logs/
+|-- tests/
+|-- .github/workflows/tests.yml
+|-- .env.example
+|-- .gitignore
+|-- Dockerfile
+|-- main.py
+|-- pyproject.toml
+|-- requirements.txt
+|-- sentinelsoc_sample_alerts.csv
+`-- README.md
 ```
 
 The structure above highlights the main components. Detection modules and additional files may vary as the project evolves.
